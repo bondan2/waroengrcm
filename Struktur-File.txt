@@ -1,0 +1,107 @@
+waroeng-rcm-kang-abuy/
+├── public/
+│   ├── images/
+│   │   ├── logo.png
+│   │   ├── qris.png
+│   │   └── .gitkeep
+│   ├── sounds/
+│   │   └── .gitkeep
+│   ├── manifest.json
+│   └── sw.js
+├── src/
+│   ├── api/
+│   │   └── supabase.js
+│   ├── components/
+│   │   ├── auth/
+│   │   │   └── ProtectedRoute.jsx
+│   │   ├── customer/
+│   │   │   ├── CartDrawer.jsx
+│   │   │   ├── MenuCard.jsx
+│   │   │   └── OrderTracking.jsx
+│   │   ├── layout/
+│   │   │   ├── CustomerLayout.jsx
+│   │   │   ├── DashboardLayout.jsx
+│   │   │   ├── Header.jsx
+│   │   │   └── Sidebar.jsx
+│   │   ├── shared/
+│   │   │   ├── EmptyState.jsx
+│   │   │   ├── ErrorBoundary.jsx
+│   │   │   └── LoadingSpinner.jsx
+│   │   └── ui/
+│   │       ├── Badge.jsx
+│   │       ├── Button.jsx
+│   │       ├── Card.jsx
+│   │       ├── Input.jsx
+│   │       ├── Modal.jsx
+│   │       ├── NotificationCenter.jsx
+│   │       ├── Skeleton.jsx
+│   │       └── Toast.jsx
+│   ├── hooks/
+│   │   ├── useAudio.js
+│   │   ├── useAuth.js
+│   │   ├── useCart.js
+│   │   ├── useNotification.js
+│   │   ├── useRealtime.js
+│   │   └── useSupabase.js
+│   ├── layouts/
+│   │   ├── CustomerLayout.jsx
+│   │   └── DashboardLayout.jsx
+│   ├── lib/
+│   │   ├── supabaseClient.js
+│   │   └── utils.js
+│   ├── pages/
+│   │   ├── admin/
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── ManageCashiers.jsx
+│   │   │   ├── ManageCategories.jsx
+│   │   │   ├── ManageMenu.jsx
+│   │   │   ├── ManageOrders.jsx
+│   │   │   ├── ManagePromos.jsx
+│   │   │   ├── ManageTables.jsx
+│   │   │   ├── Reports.jsx
+│   │   │   └── Settings.jsx
+│   │   ├── auth/
+│   │   │   └── Login.jsx
+│   │   ├── cashier/
+│   │   │   ├── Closing.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── History.jsx
+│   │   │   ├── Orders.jsx
+│   │   │   ├── Payments.jsx
+│   │   │   ├── POS.jsx
+│   │   │   ├── Tables.jsx
+│   │   │   └── TakeawayQueue.jsx
+│   │   └── customer/
+│   │       ├── Cart.jsx
+│   │       ├── Checkout.jsx
+│   │       ├── Contact.jsx
+│   │       ├── Home.jsx
+│   │       ├── Menu.jsx
+│   │       └── Tracking.jsx
+│   ├── routes/
+│   │   └── index.jsx
+│   ├── services/
+│   │   ├── menuService.js
+│   │   ├── orderService.js
+│   │   ├── paymentService.js
+│   │   └── tableService.js
+│   ├── stores/
+│   │   ├── authStore.js
+│   │   ├── cartStore.js
+│   │   ├── notificationStore.js
+│   │   ├── tableStore.js
+│   │   └── uiStore.js
+│   ├── styles/
+│   │   └── index.css
+│   ├── utils/
+│   │   └── helpers.js
+│   ├── App.jsx
+│   └── main.jsx
+├── .env.example
+├── .gitignore
+├── index.html
+├── package.json
+├── postcss.config.js
+├── tailwind.config.js
+├── vercel.json
+└── vite.config.js
