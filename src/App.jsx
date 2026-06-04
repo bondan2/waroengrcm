@@ -49,18 +49,25 @@ import CashierNotifications from './pages/cashier/Notifications'
 import CashierActivityLog from './pages/cashier/ActivityLog'
 
 // ============================================
-// CUSTOMER PAGES
+// CUSTOMER PAGES (KHUSUS CUSTOMER LOGIN)
+// ============================================
+import CustomerHome from './pages/customer/CustomerHome'
+import CustomerMenu from './pages/customer/CustomerMenu'
+import OrderHistory from './pages/customer/OrderHistory'
+import Favorites from './pages/customer/Favorites'
+import MyVouchers from './pages/customer/MyVouchers'
+import Membership from './pages/customer/Membership'
+import Contact from './pages/customer/Contact'
+
+// ============================================
+// PUBLIC PAGES (GUEST - TIDAK PERLU LOGIN)
 // ============================================
 import Home from './pages/customer/Home'
 import Menu from './pages/customer/Menu'
 import Cart from './pages/customer/Cart'
 import Checkout from './pages/customer/Checkout'
 import OrderTracking from './pages/customer/OrderTracking'
-import OrderHistory from './pages/customer/OrderHistory'
-import Favorites from './pages/customer/Favorites'
-import MyVouchers from './pages/customer/MyVouchers'
-import Membership from './pages/customer/Membership'
-import Contact from './pages/customer/Contact'
+import QRTableOrder from './pages/customer/QRTableOrder'
 
 // ============================================
 // AUTH PAGES
@@ -78,9 +85,7 @@ function App() {
   const { user, role, setUser, setProfile } = useAuthStore()
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    checkSession()
-  }, [])
+  useEffect(() => { checkSession() }, [])
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -88,11 +93,9 @@ function App() {
         if (event === 'SIGNED_IN' && session?.user) {
           setUser(session.user)
           await loadProfile(session.user.id)
-        } else if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
-          if (!session) {
-            setUser(null)
-            setProfile(null)
-          }
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null)
+          setProfile(null)
         }
       }
     )
@@ -115,11 +118,7 @@ function App() {
 
   const loadProfile = async (userId) => {
     try {
-      const { data } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle()
+      const { data } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
       if (data) setProfile(data)
     } catch (error) {
       console.error('Profile load error:', error)
@@ -131,7 +130,9 @@ function App() {
   return (
     <ErrorBoundary>
       <Routes>
-        {/* PUBLIC ROUTES */}
+        {/* ============================================ */}
+        {/* PUBLIC ROUTES - LANDING PAGE (Guest Layout) */}
+        {/* ============================================ */}
         <Route element={<GuestLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/menu" element={<Menu />} />
@@ -141,8 +142,20 @@ function App() {
           <Route path="/contact" element={<Contact />} />
         </Route>
 
-        {/* CUSTOMER ROUTES */}
-        <Route element={<CustomerLayout />}>
+        {/* QR Table Order - Public */}
+        <Route path="/order" element={<QRTableOrder />} />
+
+        {/* ============================================ */}
+        {/* CUSTOMER DASHBOARD (Customer Layout) */}
+        {/* HARUS LOGIN sebagai Customer */}
+        {/* ============================================ */}
+        <Route element={
+          <ProtectedRoute allowedRoles={['customer']}>
+            <CustomerLayout />
+          </ProtectedRoute>
+        }>
+          <Route path="/customer" element={<CustomerHome />} />
+          <Route path="/customer/menu" element={<CustomerMenu />} />
           <Route path="/customer/history" element={<OrderHistory />} />
           <Route path="/customer/favorites" element={<Favorites />} />
           <Route path="/customer/vouchers" element={<MyVouchers />} />
@@ -150,8 +163,14 @@ function App() {
           <Route path="/customer/profile" element={<Profile />} />
         </Route>
 
-        {/* CASHIER ROUTES */}
-        <Route element={<ProtectedRoute allowedRoles={['cashier', 'admin']}><CashierLayout /></ProtectedRoute>}>
+        {/* ============================================ */}
+        {/* CASHIER DASHBOARD */}
+        {/* ============================================ */}
+        <Route element={
+          <ProtectedRoute allowedRoles={['cashier', 'admin']}>
+            <CashierLayout />
+          </ProtectedRoute>
+        }>
           <Route path="/cashier" element={<CashierDashboard />} />
           <Route path="/cashier/pos" element={<POS />} />
           <Route path="/cashier/orders" element={<CashierOrders />} />
@@ -166,8 +185,14 @@ function App() {
           <Route path="/cashier/profile" element={<Profile />} />
         </Route>
 
-        {/* ADMIN ROUTES */}
-        <Route element={<ProtectedRoute allowedRoles={['admin']}><AdminLayout /></ProtectedRoute>}>
+        {/* ============================================ */}
+        {/* ADMIN DASHBOARD */}
+        {/* ============================================ */}
+        <Route element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminLayout />
+          </ProtectedRoute>
+        }>
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/menu" element={<ManageMenu />} />
           <Route path="/admin/categories" element={<ManageCategories />} />
@@ -187,19 +212,23 @@ function App() {
           <Route path="/admin/profile" element={<Profile />} />
         </Route>
 
+        {/* ============================================ */}
         {/* AUTH ROUTES */}
+        {/* ============================================ */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
 
+        {/* ============================================ */}
         {/* 404 */}
+        {/* ============================================ */}
         <Route path="*" element={
           <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
             <div className="text-center">
               <h1 className="text-6xl sm:text-8xl font-bold text-gray-200 mb-4">404</h1>
               <h2 className="text-xl font-bold text-gray-900 mb-2">Halaman Tidak Ditemukan</h2>
               <p className="text-gray-500 mb-6 text-sm">Maaf, halaman yang Anda cari tidak ditemukan.</p>
-              <a href="/" className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all inline-block">
+              <a href="/" className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg inline-block text-sm">
                 Kembali ke Home
               </a>
             </div>
@@ -211,7 +240,7 @@ function App() {
 }
 
 // ============================================
-// PROTECTED ROUTE COMPONENT
+// PROTECTED ROUTE
 // ============================================
 function ProtectedRoute({ children, allowedRoles = [] }) {
   const { user, role } = useAuthStore()
@@ -224,6 +253,7 @@ function ProtectedRoute({ children, allowedRoles = [] }) {
   if (allowedRoles.length > 0 && !allowedRoles.includes(role)) {
     if (role === 'admin') return <Navigate to="/admin" replace />
     if (role === 'cashier') return <Navigate to="/cashier" replace />
+    if (role === 'customer') return <Navigate to="/customer" replace />
     return <Navigate to="/" replace />
   }
 
