@@ -1,7 +1,7 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Home, UtensilsCrossed, ShoppingCart, Phone, Menu, X, LogIn, User, ChevronRight } from 'lucide-react'
+import { Home, UtensilsCrossed, ShoppingCart, Phone, Menu, X, LogIn, User, ChevronRight, Camera } from 'lucide-react'
 import useCartStore from '../../stores/cartStore'
 import useAuthStore from '../../stores/authStore'
 
@@ -17,6 +17,7 @@ export default function GuestLayout() {
   const navLinks = [
     { path: '/',        label: 'Home',    icon: Home },
     { path: '/menu',   label: 'Menu',     icon: UtensilsCrossed },
+    { path: '/gallery',label: 'Galeri',   icon: Camera },
     { path: '/contact',label: 'Kontak',   icon: Phone },
   ]
   const isActive = (path) => location.pathname === path
@@ -32,10 +33,7 @@ export default function GuestLayout() {
 
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                   style={{ background: '#f05a28' }}>
-                <UtensilsCrossed className="w-4 h-4 text-white" />
-              </div>
+              <img src="https://tbjzsyoygpaioxxhsnmk.supabase.co/storage/v1/object/public/website-assets/logo/logo1.png" alt="Logo Waroeng RCM" className="w-16 h-16 object-contain drop-shadow-sm scale-110 transform origin-left" />
               <div>
                 <p className="font-bold text-gray-900 text-sm leading-none">WAROENG RCM</p>
                 <p className="text-[10px] leading-none mt-0.5" style={{ color: '#f05a28' }}>Kang Abuy</p>
@@ -112,9 +110,7 @@ export default function GuestLayout() {
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#f05a28' }}>
-                    <UtensilsCrossed className="w-4 h-4 text-white" />
-                  </div>
+                  <img src="https://tbjzsyoygpaioxxhsnmk.supabase.co/storage/v1/object/public/website-assets/logo/logo1.png" alt="Logo" className="w-16 h-16 object-contain drop-shadow-sm scale-110 transform origin-left" />
                   <p className="font-bold text-gray-900 text-sm">WAROENG RCM</p>
                 </div>
                 <button onClick={() => setMobileMenuOpen(false)} className="p-2 rounded-full hover:bg-gray-50">

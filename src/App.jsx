@@ -68,6 +68,7 @@ import Cart from './pages/customer/Cart'
 import Checkout from './pages/customer/Checkout'
 import OrderTracking from './pages/customer/OrderTracking'
 import QRTableOrder from './pages/customer/QRTableOrder'
+import Gallery from './pages/customer/Gallery'
 
 // ============================================
 // AUTH PAGES
@@ -140,6 +141,7 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order/:id" element={<OrderTracking />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/gallery" element={<Gallery />} />
         </Route>
 
         {/* QR Table Order - Public */}

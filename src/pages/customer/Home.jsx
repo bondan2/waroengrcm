@@ -26,6 +26,7 @@ const DEFAULT_INFO = {
   whatsapp_number: '082110011010',
   operating_hours: 'Senin–Sabtu: 10.00–22.00 | Minggu: Tutup',
   gofood_url: 'https://gofood.co.id/jakarta/restaurant/waroeng-rcm-kang-abuy-b9ada0f0-93a9-448a-997d-14a56bc904db',
+  instagram_url: 'https://www.instagram.com/waroeng.rcm.kang.abuy',
 }
 
 const fadeUp = {
@@ -149,9 +150,12 @@ export default function Home() {
         <div className="bg-white mx-3 -mt-6 relative z-10 rounded-2xl border border-gray-100 p-4"
              style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
           <div className="flex items-center gap-3">
-            {settings?.logo_url && (
+            {settings?.logo_url ? (
               <img src={settings.logo_url} alt="Logo"
-                className="w-14 h-14 rounded-xl object-contain border border-gray-100 flex-shrink-0" />
+                className="w-20 h-20 rounded-xl object-contain border border-gray-100 flex-shrink-0 bg-white scale-110 transform origin-left" />
+            ) : (
+              <img src="https://tbjzsyoygpaioxxhsnmk.supabase.co/storage/v1/object/public/website-assets/logo/logo1.png" alt="Logo Waroeng RCM"
+                className="w-20 h-20 rounded-xl object-contain border border-gray-100 flex-shrink-0 bg-white shadow-sm scale-110 transform origin-left" />
             )}
             <div className="flex-1 min-w-0">
               <h1 className="font-bold text-gray-900 text-base leading-snug">
@@ -336,10 +340,7 @@ export default function Home() {
       {/* ─── FOOTER ─── */}
       <footer className="mt-8 bg-gray-900 text-white px-4 py-8">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-               style={{ background: PRIMARY }}>
-            <UtensilsCrossed className="w-5 h-5 text-white" />
-          </div>
+          <img src="https://tbjzsyoygpaioxxhsnmk.supabase.co/storage/v1/object/public/website-assets/logo/logo1.png" alt="Logo Waroeng RCM" className="w-20 h-20 object-contain drop-shadow-sm scale-110 transform origin-left" />
           <div>
             <p className="font-bold text-sm">{settings?.restaurant_name || DEFAULT_INFO.restaurant_name}</p>
             <p className="text-[11px] text-gray-400">Kang Abuy</p>
@@ -370,8 +371,8 @@ export default function Home() {
           </div>
 
           {/* Instagram */}
-          {settings?.instagram_url && (
-            <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer"
+          {(settings?.instagram_url || DEFAULT_INFO.instagram_url) && (
+            <a href={settings?.instagram_url || DEFAULT_INFO.instagram_url} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 text-xs text-gray-400 hover:text-white">
               <Instagram className="w-3.5 h-3.5" style={{ color: PRIMARY }} />
               <span>Instagram</span>
