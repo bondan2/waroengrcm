@@ -182,7 +182,7 @@ export default function ManageCustomer() {
         </div>
         <button
           onClick={handleExportCSV}
-          className="flex items-center space-x-2 px-4 py-2.5 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 transition-colors"
+          className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
         >
           <Download className="w-4 h-4" />
           <span>Export CSV</span>

@@ -125,7 +125,7 @@ export default function ManageCashier() {
               {/* Desktop */}
               <div className="hidden sm:flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-white font-bold">
                     {c.full_name?.[0] || 'K'}
                   </div>
                   <div>
@@ -152,7 +152,7 @@ export default function ManageCashier() {
               <div className="sm:hidden">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white font-bold text-sm">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-white font-bold text-sm">
                       {c.full_name?.[0] || 'K'}
                     </div>
                     <div>

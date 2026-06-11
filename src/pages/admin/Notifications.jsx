@@ -236,7 +236,7 @@ export default function AdminNotifications() {
           </button>
           <button
             onClick={markAllAsRead}
-            className="px-4 py-2.5 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 transition-colors"
+            className="px-4 py-2.5 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
           >
             Tandai Semua Dibaca
           </button>

@@ -188,7 +188,7 @@ export default function AdminActivityLog() {
         <div className="flex items-center space-x-3">
           <button
             onClick={handleExportCSV}
-            className="px-4 py-2.5 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 transition-colors"
+            className="px-4 py-2.5 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
           >
             <Download className="w-4 h-4 inline mr-1" />
             Export CSV

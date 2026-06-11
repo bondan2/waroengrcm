@@ -246,7 +246,7 @@ export default function QRTable() {
         </div>
         <div className="flex items-center space-x-2">
           <button onClick={generateAllQR}
-            className="px-3 py-2 bg-green-500 text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-green-600 flex items-center">
+            className="px-3 py-2 bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-lg text-xs sm:text-sm font-semibold hover:shadow-lg flex items-center">
             <RefreshCw className="w-4 h-4 mr-1" />Generate Semua
           </button>
           <button onClick={bulkPrintQR} disabled={selectedTables.length === 0}
@@ -254,7 +254,7 @@ export default function QRTable() {
             <Printer className="w-4 h-4 mr-1" />Print ({selectedTables.length})
           </button>
           <button onClick={() => handleOpenModal()}
-            className="px-3 py-2 bg-orange-500 text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-orange-600 flex items-center">
+            className="px-3 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg text-xs sm:text-sm font-semibold hover:shadow-lg flex items-center">
             <Plus className="w-4 h-4 mr-1" /><span className="hidden sm:inline">Tambah</span>
           </button>
         </div>
@@ -368,7 +368,7 @@ export default function QRTable() {
                 <button type="button" onClick={() => setShowModal(false)}
                   className="flex-1 py-2.5 bg-gray-100 rounded-xl font-semibold text-sm">Batal</button>
                 <button type="submit"
-                  className="flex-1 py-2.5 bg-orange-500 text-white rounded-xl font-semibold text-sm">
+                  className="flex-1 py-2.5 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl font-semibold text-sm hover:shadow-lg">
                   {editingTable ? 'Update' : 'Simpan'}
                 </button>
               </div>

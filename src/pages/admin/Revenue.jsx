@@ -191,7 +191,7 @@ export default function Revenue() {
           <button onClick={loadRevenueData} className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200" title="Refresh">
             <RefreshCw className="w-4 h-4" />
           </button>
-          <button onClick={handleExport} className="flex items-center space-x-1 px-3 py-2 bg-green-500 text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-green-600">
+          <button onClick={handleExport} className="flex items-center space-x-1 px-3 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg text-xs sm:text-sm font-semibold hover:shadow-lg">
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Export</span>
           </button>
