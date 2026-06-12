@@ -162,25 +162,30 @@ export default function QRTableOrder() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col relative">
+      {/* ─── App Content terpusat ─── */}
+      <div className="w-full max-w-[480px] mx-auto bg-white min-h-screen shadow-[0_0_40px_rgba(0,0,0,0.1)] relative isolate flex flex-col">
       {/* ============================================ */}
       {/* MODAL GUEST INFO */}
       {/* ============================================ */}
       <AnimatePresence>
         {showGuestModal && (
-          <>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             />
+            
+            {/* Modal Content */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 20 }}
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.92 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="fixed inset-x-4 top-1/2 -translate-y-1/2 z-50 max-w-sm mx-auto"
+              className="relative z-10 w-full max-w-sm"
             >
               <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
                 {/* Header */}
@@ -260,7 +265,7 @@ export default function QRTableOrder() {
                 </div>
               </div>
             </motion.div>
-          </>
+          </div>
         )}
       </AnimatePresence>
 
@@ -352,11 +357,11 @@ export default function QRTableOrder() {
       </div>
 
       {/* Menu Grid */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4">
+      <div className="w-full px-3 sm:px-4 py-4 flex-1">
         {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-40 bg-white rounded-xl animate-pulse"></div>
+              <div key={i} className="h-40 bg-gray-100 rounded-xl animate-pulse"></div>
             ))}
           </div>
         ) : filteredMenus.length === 0 ? (
@@ -365,7 +370,7 @@ export default function QRTableOrder() {
             <p className="text-gray-500">Menu tidak ditemukan</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 pb-20">
+          <div className="grid grid-cols-2 gap-3 pb-20">
             {filteredMenus.map(menu => (
               <motion.button
                 key={menu.id}
@@ -399,7 +404,7 @@ export default function QRTableOrder() {
 
       {/* Cart Button Mobile */}
       {cart.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-3 bg-white border-t shadow-2xl z-30">
+        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 p-3 bg-white border-t shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-30 w-full max-w-[480px]">
           <button
             onClick={() => setShowCart(true)}
             className="w-full py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl font-bold flex items-center justify-center"
@@ -413,8 +418,8 @@ export default function QRTableOrder() {
 
       {/* Cart Slide-up Modal */}
       {showCart && (
-        <div className="fixed inset-0 z-40 flex flex-col bg-white" onClick={() => setShowCart(false)}>
-          <div className="flex-1 flex flex-col max-h-full" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-40 bg-black/60 flex flex-col items-center" onClick={() => setShowCart(false)}>
+          <div className="w-full max-w-[480px] bg-white mt-auto h-full sm:h-[90vh] sm:rounded-t-3xl flex flex-col" onClick={e => e.stopPropagation()}>
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b bg-white sticky top-0 z-10">
               <button onClick={() => setShowCart(false)} className="flex items-center text-gray-600">
@@ -509,6 +514,7 @@ export default function QRTableOrder() {
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }

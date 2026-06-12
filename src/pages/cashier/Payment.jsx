@@ -245,9 +245,15 @@ export default function CashierPayment() {
           
           if (projectSlug && apiKey) {
             try {
-              const res = await fetch(`https://app.pakasir.com/api/transactiondetail?project=${projectSlug}&amount=${payment.amount}&order_id=${order.id}&api_key=${apiKey}`)
-              const data = await res.json()
-              const isPaid = data?.status === 'completed' || data?.status === 'success' || data?.status === 'paid'
+              const res = await fetch(`/api/pakasir/transactiondetail?project=${projectSlug}&amount=${payment.amount}&order_id=${order.id}&api_key=${apiKey}`)
+              const text = await res.text()
+              let data;
+              try {
+                data = JSON.parse(text)
+              } catch (e) {
+                throw new Error(`Bukan JSON. Status: ${res.status}. Isi: ${text}`)
+              }
+              const isPaid = data?.transaction?.status === 'completed' || data?.transaction?.status === 'success' || data?.transaction?.status === 'paid' || data?.status === 'completed' || data?.status === 'success' || data?.status === 'paid'
               
               if (!isPaid) {
                 toast.error('Pembayaran QRIS belum masuk di sistem Pakasir!')

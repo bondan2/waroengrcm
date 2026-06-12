@@ -128,7 +128,7 @@ export default function Cart() {
       </div>
 
       {/* ─── BOTTOM CHECKOUT BAR ─── */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-30 w-full max-w-app bg-white border-t border-gray-100"
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-30 w-full max-w-[480px] bg-white border-t border-gray-100"
            style={{ boxShadow: '0 -4px 20px rgba(0,0,0,0.08)' }}>
         {/* Summary */}
         <div className="px-4 pt-3 pb-1">

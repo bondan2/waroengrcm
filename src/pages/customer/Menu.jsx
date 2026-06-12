@@ -195,19 +195,22 @@ export default function Menu() {
       {/* ============================================ */}
       <AnimatePresence>
         {showGuestModal && (
-          <>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             />
+            
+            {/* Modal Content */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 20 }}
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.92 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="fixed inset-x-4 top-1/2 -translate-y-1/2 z-50 max-w-sm mx-auto"
+              className="relative z-10 w-full max-w-sm"
             >
               <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
                 {/* Header */}
@@ -287,7 +290,7 @@ export default function Menu() {
                 </div>
               </div>
             </motion.div>
-          </>
+          </div>
         )}
       </AnimatePresence>
 
@@ -454,11 +457,11 @@ export default function Menu() {
             {/* Bottom Sheet — fixed, muncul dari bawah viewport */}
             <motion.div
               key="modal"
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed bottom-0 left-0 right-0 z-50 bg-white flex flex-col mx-auto max-w-[480px]"
+              initial={{ y: '100%', x: '-50%' }}
+              animate={{ y: 0, x: '-50%' }}
+              exit={{ y: '100%', x: '-50%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="fixed bottom-0 left-1/2 z-50 bg-white flex flex-col w-full max-w-[480px]"
               style={{
                 borderRadius: '20px 20px 0 0',
                 maxHeight: expandModal ? '85vh' : '75vh',

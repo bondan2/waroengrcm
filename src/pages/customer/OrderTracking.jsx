@@ -117,7 +117,7 @@ export default function OrderTracking() {
         return
       }
 
-      const res = await fetch('https://app.pakasir.com/api/transactioncreate/qris', {
+      const res = await fetch('/api/pakasir/transactioncreate/qris', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -127,17 +127,27 @@ export default function OrderTracking() {
           api_key: apiKey
         })
       })
-      const data = await res.json()
+      
+      const text = await res.text()
+      let data;
+      try {
+        data = JSON.parse(text)
+      } catch (err) {
+        throw new Error(`Bukan JSON. Status HTTP: ${res.status}. Isi: ${text}`)
+      }
+      
       console.log('Pakasir Generate Response:', data)
       
-      const qrStr = data?.qris_string || data?.qr_string || data?.qris || data?.data?.qris_string || data?.data?.qr_string || data?.data?.qris || (typeof data?.data === 'string' ? data.data : null)
+      const qrStr = data?.payment?.payment_number || data?.qris_string || data?.qr_string || data?.qris || data?.data?.qris_string || data?.data?.qr_string || data?.data?.qris || (typeof data?.data === 'string' ? data.data : null)
+      
       if (qrStr) {
         setQrisString(qrStr)
       } else {
-        toast.error('Gagal memuat QRIS dari Pakasir')
+        toast.error('Gagal memuat QRIS: ' + (data?.message || JSON.stringify(data)))
       }
     } catch (error) {
       console.error('Error generating QRIS:', error)
+      toast.error('Koneksi ke Pakasir gagal: ' + error.message)
     } finally {
       setPakasirLoading(false)
     }
@@ -162,12 +172,12 @@ export default function OrderTracking() {
       const apiKey = import.meta.env.VITE_PAKASIR_API_KEY
       if (!projectSlug || !apiKey) return
 
-      const res = await fetch(`https://app.pakasir.com/api/transactiondetail?project=${projectSlug}&amount=${payment.amount}&order_id=${order.id}&api_key=${apiKey}`)
+      const res = await fetch(`/api/pakasir/transactiondetail?project=${projectSlug}&amount=${payment.amount}&order_id=${order.id}&api_key=${apiKey}`)
       const data = await res.json()
       console.log('Pakasir Status Polling:', data)
       
       // Asumsi status berhasil dari Pakasir adalah 'completed', 'success', atau 'paid'
-      const isPaid = data?.status === 'completed' || data?.status === 'success' || data?.status === 'paid'
+      const isPaid = data?.transaction?.status === 'completed' || data?.transaction?.status === 'success' || data?.transaction?.status === 'paid' || data?.status === 'completed' || data?.status === 'success' || data?.status === 'paid'
       
       if (isPaid) {
         // 1. Update Payment
