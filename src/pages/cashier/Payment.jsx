@@ -385,11 +385,6 @@ export default function CashierPayment() {
     navigate('/cashier/payment')
   }
 
-  const handleViewProof = (url) => {
-    setProofImage(url)
-    setShowProofModal(true)
-  }
-
   // ============================================
   // ORDER DETAIL VIEW
   // ============================================
