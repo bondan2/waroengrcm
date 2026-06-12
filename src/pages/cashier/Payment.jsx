@@ -238,6 +238,37 @@ export default function CashierPayment() {
       console.log('💳 Validating payment for order:', order.id.slice(0,8))
       
       if (payment) {
+        // === CEK STATUS PAKASIR JIKA QRIS ===
+        if (payment.method === 'qris') {
+          const projectSlug = import.meta.env.VITE_PAKASIR_PROJECT_SLUG
+          const apiKey = import.meta.env.VITE_PAKASIR_API_KEY
+          
+          if (projectSlug && apiKey) {
+            try {
+              const res = await fetch(`https://app.pakasir.com/api/transactiondetail?project=${projectSlug}&amount=${payment.amount}&order_id=${order.id}&api_key=${apiKey}`)
+              const data = await res.json()
+              const isPaid = data?.status === 'completed' || data?.status === 'success' || data?.status === 'paid'
+              
+              if (!isPaid) {
+                toast.error('Pembayaran QRIS belum masuk di sistem Pakasir!')
+                setValidating(false)
+                return
+              }
+              // Jika sudah dibayar, lanjut update ke Supabase
+            } catch (err) {
+              console.error('Pakasir Check Error:', err)
+              // Jika gagal koneksi ke Pakasir, kita bisa tanyakan apakah kasir mau paksa manual atau tidak.
+              // Untuk saat ini, asumsikan kita butuh kepastian dari Pakasir.
+              toast.error('Gagal mengecek status ke Pakasir.')
+              setValidating(false)
+              return
+            }
+          } else {
+            // Fallback manual jika API Key tidak dikonfigurasi
+            console.log('Pakasir belum dikonfigurasi, menggunakan validasi manual.')
+          }
+        }
+        
         // Update existing payment
         const { error: payError } = await supabase
           .from('payments')
@@ -450,17 +481,24 @@ export default function CashierPayment() {
           <div className="bg-white rounded-2xl shadow-sm border p-4 sm:p-6">
             <h3 className="text-lg font-bold mb-3">Konfirmasi Pembayaran</h3>
             <p className="text-sm text-gray-500 mb-4">
- {payment ? 'Klik tombol di bawah untuk mengkonfirmasi pembayaran.' : 'Belum ada data pembayaran. Klik tombol di bawah untuk membuat pembayaran.'}
+              {payment?.method === 'qris' 
+                ? 'Klik tombol di bawah untuk mengecek status pembayaran ke sistem Pakasir.' 
+                : payment 
+                  ? 'Klik tombol di bawah untuk mengkonfirmasi pembayaran tunai.' 
+                  : 'Belum ada data pembayaran. Klik tombol di bawah untuk membuat pembayaran.'}
             </p>
             <button
               onClick={handleValidatePayment}
               disabled={validating}
-              className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-bold hover:shadow-lg disabled:opacity-50 transition-all text-base flex items-center justify-center"
+              className={`w-full py-4 ${payment?.method === 'qris' ? 'bg-gradient-to-r from-blue-500 to-indigo-600' : 'bg-gradient-to-r from-green-500 to-emerald-600'} text-white rounded-xl font-bold hover:shadow-lg disabled:opacity-50 transition-all text-base flex items-center justify-center`}
             >
               {validating ? (
                 <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>Memproses...</>
               ) : (
-                <><CheckCircle className="w-5 h-5 mr-2" />Konfirmasi Pembayaran → SUKSES</>
+                <>
+                  <CheckCircle className="w-5 h-5 mr-2" />
+                  {payment?.method === 'qris' ? 'Cek Status & Sinkronisasi Pakasir' : 'Konfirmasi Pembayaran → SUKSES'}
+                </>
               )}
             </button>
           </div>

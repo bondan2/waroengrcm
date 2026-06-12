@@ -126,26 +126,7 @@ export default function Checkout() {
 
       if (itemsError) throw itemsError
 
-      // 3. BUAT PAYMENT - SELALU PENDING (PERLU VALIDASI KASIR)
-      let proofUrl = null
-
-      if (paymentMethod === 'qris' && proofFile) {
-        const fileExt = proofFile.name.split('.').pop()
-        const fileName = `proof-${order.id}-${Date.now()}.${fileExt}`
-        
-        const { error: uploadError } = await supabase.storage
-          .from('payment-proofs')
-          .upload(fileName, proofFile, { cacheControl: '3600', upsert: true })
-
-        if (!uploadError) {
-          const { data: urlData } = supabase.storage
-            .from('payment-proofs')
-            .getPublicUrl(fileName)
-          proofUrl = urlData?.publicUrl
-        }
-      }
-
-      // PENTING: Semua payment status PENDING (perlu validasi kasir)
+      // PENTING: Semua payment status PENDING (perlu validasi kasir atau Pakasir)
       const { error: paymentError } = await supabase
         .from('payments')
         .insert({
@@ -153,7 +134,7 @@ export default function Checkout() {
           amount: total,
           method: paymentMethod,
           status: 'pending', // SELALU PENDING
-          proof_url: proofUrl || null
+          proof_url: null
         })
 
       if (paymentError) {
@@ -172,7 +153,7 @@ export default function Checkout() {
       await supabase.from('notifications').insert({
         user_id: null, // Untuk semua staff
         title: 'Order Baru! 🔔',
-        message: `${customerName.trim()} - Order #${order.id.slice(0, 8)} - ${formatCurrency(total)} - ${paymentMethod.toUpperCase()}${orderTypeState === 'dine_in' ? ` - Meja ${tableNumber}` : ' - Takeaway'}. Perlu validasi pembayaran.`,
+        message: `${customerName.trim()} - Order #${order.id.slice(0, 8)} - ${formatCurrency(total)} - ${paymentMethod.toUpperCase()}${orderTypeState === 'dine_in' ? ` - Meja ${tableNumber}` : ' - Takeaway'}. Perlu pembayaran.`,
         type: 'order_created',
         link: `/cashier/payment/${order.id}`
       })
@@ -182,7 +163,7 @@ export default function Checkout() {
         await supabase.from('notifications').insert({
           user_id: user.id,
           title: 'Pesanan Dibuat! 📝',
-          message: `Order #${order.id.slice(0, 8)} menunggu validasi pembayaran. ${paymentMethod === 'cash' ? 'Silakan bayar di kasir.' : 'Upload bukti pembayaran jika belum.'}`,
+          message: `Order #${order.id.slice(0, 8)} menunggu pembayaran. ${paymentMethod === 'cash' ? 'Silakan bayar di kasir.' : 'Silakan scan QRIS.'}`,
           type: 'order_created',
           link: `/order/${order.id}`
         })
@@ -195,13 +176,14 @@ export default function Checkout() {
         type: 'order_created'
       })
 
-      console.log('✅ Checkout complete! Menunggu validasi pembayaran.')
-      setOrderData(order)
-      setOrderComplete(true)
+      console.log('✅ Checkout complete! Menunggu pembayaran.')
       clearCart()
       // Suara konfirmasi untuk customer
       playOrderNewSound()
-      toast.success('Pesanan dibuat! Silakan lakukan pembayaran.')
+      toast.success('Pesanan dibuat!')
+      
+      // Langsung redirect ke halaman tracking order untuk bayar QRIS atau lihat status
+      navigate(`/order/${order.id}`)
 
     } catch (error) {
       console.error('Checkout error:', error)
@@ -416,40 +398,9 @@ export default function Checkout() {
 
             {paymentMethod === 'qris' && (
               <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-4 pt-4 border-t border-gray-100 space-y-4">
-                {qrisImage ? (
-                  <div className="bg-gray-50 p-4 rounded-xl flex flex-col items-center border border-gray-200">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Scan QRIS Berikut</p>
-                    <div className="bg-white p-3 rounded-2xl shadow-sm mb-3">
-                      <img src={qrisImage} alt="QRIS" className="w-40 h-40 object-cover rounded-xl" />
-                    </div>
-                    <p className="text-sm font-bold text-gray-900">Total Tagihan:</p>
-                    <p className="text-lg font-bold text-orange-600">{formatCurrency(total)}</p>
-                  </div>
-                ) : (
-                  <div className="text-center p-4 bg-yellow-50 rounded-xl text-sm font-medium text-yellow-700 border border-yellow-200">
-                    Sistem QRIS belum dikonfigurasi. Silakan pilih Tunai.
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Upload Bukti Transfer</label>
-                  <label className="border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-all bg-gray-50">
-                    {proofPreview ? (
-                      <>
-                        <img src={proofPreview} alt="Bukti" className="h-32 object-contain rounded-lg shadow-sm mb-3" />
-                        <span className="text-xs font-bold text-orange-600 bg-orange-100 px-3 py-1.5 rounded-full">Ganti Gambar</span>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center mb-3">
-                          <Upload className="w-5 h-5 text-gray-400" />
-                        </div>
-                        <p className="text-sm font-bold text-gray-700">Pilih Foto Bukti</p>
-                        <p className="text-xs text-gray-500 mt-1">Format: JPG, PNG</p>
-                      </>
-                    )}
-                    <input type="file" accept="image/*" onChange={handleProofChange} className="hidden" />
-                  </label>
+                <div className="text-center p-4 bg-orange-50 rounded-xl text-sm font-medium text-orange-700 border border-orange-200">
+                  <QrCode className="w-8 h-8 mx-auto mb-2 text-orange-500" />
+                  Kode QRIS akan dibuat setelah Anda memencet tombol "Pesan Sekarang". Silakan siapkan aplikasi pembayaran Anda (BCA, GoPay, OVO, Dana, dll).
                 </div>
               </motion.div>
             )}

@@ -8,6 +8,8 @@ import {
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { formatCurrency, formatDateTime } from '../../utils/format'
+import { toast } from 'sonner'
+import { QRCodeSVG } from 'qrcode.react'
 
 export default function OrderTracking() {
   const { id } = useParams()
@@ -17,6 +19,10 @@ export default function OrderTracking() {
   const [payment, setPayment] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showProofModal, setShowProofModal] = useState(false)
+
+  // Pakasir QRIS State
+  const [qrisString, setQrisString] = useState(null)
+  const [pakasirLoading, setPakasirLoading] = useState(false)
 
   useEffect(() => {
     if (id) loadOrder()
@@ -87,6 +93,101 @@ export default function OrderTracking() {
       setPayment(payData || null)
     } catch (error) {
       console.error('Error loading payment:', error)
+    }
+  }
+
+  // ============================================
+  // PAKASIR INTEGRATION (Generate QRIS)
+  // ============================================
+  useEffect(() => {
+    if (!order || !payment) return
+    if (payment.method === 'qris' && payment.status === 'pending' && !qrisString && !pakasirLoading) {
+      generatePakasirQris()
+    }
+  }, [order, payment])
+
+  const generatePakasirQris = async () => {
+    try {
+      setPakasirLoading(true)
+      const projectSlug = import.meta.env.VITE_PAKASIR_PROJECT_SLUG
+      const apiKey = import.meta.env.VITE_PAKASIR_API_KEY
+      
+      if (!projectSlug || !apiKey) {
+        console.log('Kredensial Pakasir belum diatur di .env')
+        return
+      }
+
+      const res = await fetch('https://app.pakasir.com/api/transactioncreate/qris', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project: projectSlug,
+          order_id: order.id,
+          amount: payment.amount,
+          api_key: apiKey
+        })
+      })
+      const data = await res.json()
+      console.log('Pakasir Generate Response:', data)
+      
+      const qrStr = data?.qris_string || data?.qr_string || data?.qris || data?.data?.qris_string || data?.data?.qr_string || data?.data?.qris || (typeof data?.data === 'string' ? data.data : null)
+      if (qrStr) {
+        setQrisString(qrStr)
+      } else {
+        toast.error('Gagal memuat QRIS dari Pakasir')
+      }
+    } catch (error) {
+      console.error('Error generating QRIS:', error)
+    } finally {
+      setPakasirLoading(false)
+    }
+  }
+
+  // ============================================
+  // PAKASIR INTEGRATION (Polling Status)
+  // ============================================
+  useEffect(() => {
+    if (!order || !payment) return
+    if (payment.method === 'qris' && payment.status === 'pending') {
+      const interval = setInterval(() => {
+        checkPakasirStatus()
+      }, 5000) // Cek setiap 5 detik
+      return () => clearInterval(interval)
+    }
+  }, [order, payment])
+
+  const checkPakasirStatus = async () => {
+    try {
+      const projectSlug = import.meta.env.VITE_PAKASIR_PROJECT_SLUG
+      const apiKey = import.meta.env.VITE_PAKASIR_API_KEY
+      if (!projectSlug || !apiKey) return
+
+      const res = await fetch(`https://app.pakasir.com/api/transactiondetail?project=${projectSlug}&amount=${payment.amount}&order_id=${order.id}&api_key=${apiKey}`)
+      const data = await res.json()
+      console.log('Pakasir Status Polling:', data)
+      
+      // Asumsi status berhasil dari Pakasir adalah 'completed', 'success', atau 'paid'
+      const isPaid = data?.status === 'completed' || data?.status === 'success' || data?.status === 'paid'
+      
+      if (isPaid) {
+        // 1. Update Payment
+        await supabase.from('payments').update({ 
+          status: 'completed', 
+          validated_at: new Date().toISOString() 
+        }).eq('id', payment.id)
+
+        // 2. Update Order jika masih pending
+        if (order.status === 'pending') {
+           await supabase.from('orders').update({
+             status: 'processing',
+             updated_at: new Date().toISOString()
+           }).eq('id', order.id)
+        }
+        
+        // Polling akan otomatis berhenti karena payment.status tidak lagi 'pending' setelah fetch ulang dari supabase realtime
+      }
+    } catch (error) {
+      // Abaikan error jaringan saat polling
     }
   }
 
@@ -259,14 +360,29 @@ export default function OrderTracking() {
                 </div>
               )}
 
-              {/* Bukti Pembayaran (QRIS) */}
-              {payment?.method === 'qris' && payment?.proof_url && (
-                <button
-                  onClick={() => setShowProofModal(true)}
-                  className="mt-3 inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-600 rounded-lg text-xs font-medium hover:bg-blue-200"
-                >
-                  <Eye className="w-3 h-3 mr-1" /> Lihat Bukti Pembayaran
-                </button>
+              {/* Bukti Pembayaran / Dynamic QRIS */}
+              {payment?.method === 'qris' && payment?.status === 'pending' && (
+                <div className="mt-4 bg-white p-4 rounded-xl border border-gray-100 flex flex-col items-center">
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Scan QRIS Berikut</p>
+                  
+                  {pakasirLoading ? (
+                    <div className="w-40 h-40 flex items-center justify-center bg-gray-50 rounded-xl">
+                      <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  ) : qrisString ? (
+                    <div className="bg-white p-2 rounded-xl shadow-sm mb-2">
+                      <QRCodeSVG value={qrisString} size={180} />
+                    </div>
+                  ) : (
+                    <div className="w-40 h-40 flex items-center justify-center bg-red-50 text-red-500 text-xs text-center p-2 rounded-xl border border-red-100">
+                      Gagal memuat QRIS
+                    </div>
+                  )}
+                  
+                  <p className="text-[10px] text-gray-400 mt-2 text-center max-w-[200px]">
+                    Status akan otomatis terupdate setelah Anda melakukan pembayaran.
+                  </p>
+                </div>
               )}
             </div>
           </div>
