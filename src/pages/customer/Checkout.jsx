@@ -218,6 +218,7 @@ export default function Checkout() {
             })
           })
 
+          const snapData = await snapRes.json()
           if (snapData.token) {
             clearCart()
             if (!window.snap) {
