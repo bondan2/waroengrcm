@@ -27,7 +27,7 @@ import AdminNotifications from './pages/admin/Notifications'
 // ============================================
 import POS from './pages/cashier/POS'
 import CashierPayment from './pages/cashier/Payment'
-import TakeawayQueue from './pages/cashier/TakeawayQueue'
+
 import TransactionHistory from './pages/cashier/TransactionHistory'
 import CashierClosing from './pages/cashier/CashierClosing'
 
@@ -134,7 +134,7 @@ function App() {
           <Route path="/admin/pos" element={<POS />} />
           <Route path="/admin/payment" element={<CashierPayment />} />
           <Route path="/admin/payment/:id" element={<CashierPayment />} />
-          <Route path="/admin/takeaway" element={<TakeawayQueue />} />
+
           <Route path="/admin/history" element={<TransactionHistory />} />
           <Route path="/admin/closing" element={<CashierClosing />} />
 

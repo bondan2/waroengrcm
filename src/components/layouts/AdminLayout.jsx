@@ -36,7 +36,6 @@ const menuItems = [
   { path: '/admin/menu', icon: UtensilsCrossed, label: 'Kelola Menu' },
   { path: '/admin/categories', icon: Tags, label: 'Kelola Kategori' },
   { path: '/admin/payment', icon: CreditCard, label: 'Pesanan & Pembayaran' },
-  { path: '/admin/takeaway', icon: ClipboardList, label: 'Takeaway Queue' },
   { path: '/admin/tables', icon: Monitor, label: 'Monitoring Meja' },
   { path: '/admin/qr', icon: QrCode, label: 'QR Meja' },
   { path: '/admin/history', icon: History, label: 'Riwayat Transaksi' },

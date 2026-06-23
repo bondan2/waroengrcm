@@ -236,6 +236,7 @@ export function usePresence(channelName, userInfo) {
     return () => {
       supabase.removeChannel(channel).catch(console.error)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelName, userInfo?.id])
 
   return presenceStateRef

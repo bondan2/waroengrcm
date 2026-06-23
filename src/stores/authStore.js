@@ -70,7 +70,7 @@ const useAuthStore = create(
       signInWithPhone: async (phone) => {
         set({ loading: true, error: null })
         try {
-          const cleanPhone = phone.replace(/[\s\-\(\)]/g, '')
+          const cleanPhone = phone.replace(/[\s-()]/g, '')
           console.log('📱 Login:', cleanPhone)
 
           // Cari user
@@ -150,7 +150,7 @@ const useAuthStore = create(
       },
 
       signOut: async () => {
-        try { await supabase.auth.signOut() } catch (e) {}
+        try { await supabase.auth.signOut() } catch (e) { /* ignore */ }
         set({ user: null, profile: null, role: null, session: null, error: null })
         localStorage.removeItem('auth-storage')
       },
