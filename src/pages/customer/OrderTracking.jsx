@@ -202,7 +202,7 @@ export default function OrderTracking() {
         color: 'bg-yellow-50 border-yellow-200',
         textColor: 'text-yellow-700',
         title: 'Menunggu Validasi',
-        desc: payment.method === 'qris' ? 'Selesaikan pembayaran Anda.' : 'Menunggu konfirmasi pembayaran dari kasir.',
+        desc: payment.method === 'qris' ? 'Selesaikan pembayaran Anda.' : 'Silakan menuju kasir untuk melakukan pembayaran Tunai.',
         badge: '⚠️ MENUNGGU',
         badgeColor: 'bg-yellow-100 text-yellow-700'
       }
@@ -276,18 +276,35 @@ export default function OrderTracking() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <button onClick={() => navigate(-1)} className="flex items-center text-gray-600">
-            <ArrowLeft className="w-5 h-5 mr-1" /><span className="text-sm">Kembali</span>
-          </button>
+          {payment?.status === 'completed' ? (
+            <button onClick={() => navigate('/')} className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
+              <ArrowLeft className="w-5 h-5 mr-1" /><span className="text-sm font-medium">Beranda</span>
+            </button>
+          ) : (
+            <div className="w-24"></div> // Spacer to center the title
+          )}
           <h1 className="font-bold text-lg">Track Order</h1>
-          <div className="w-16"></div>
+          <div className="w-24"></div>
         </div>
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
+        {/* Warning Lock */}
+        {payment && payment.status !== 'completed' && (
+          <div className="bg-red-50 border border-red-200 p-4 rounded-2xl flex items-start gap-3 shadow-sm">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-bold text-red-800">Penting: Jangan Tutup Halaman Ini!</p>
+              <p className="text-xs text-red-600 mt-1 leading-relaxed">
+                {payment.method === 'cash' 
+                  ? 'Silakan segera menuju meja kasir untuk melakukan pembayaran Tunai agar pesanan Anda dapat segera diproses.'
+                  : 'Pesanan Anda baru akan masuk ke dapur SETELAH kasir memvalidasi bukti transfer Anda.'}
+              </p>
+            </div>
+          </div>
+        )}
         {/* Order Info */}
         <div className="bg-white rounded-2xl shadow-sm border p-4 sm:p-6">
           <div className="flex items-center justify-between mb-3">
@@ -386,20 +403,6 @@ export default function OrderTracking() {
           </div>
         </div>
 
-        {/* Modal Lihat Bukti */}
-        {showProofModal && payment?.proof_url && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowProofModal(false)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-2xl max-w-sm w-full overflow-hidden" onClick={e => e.stopPropagation()}>
-              <div className="p-4 border-b flex justify-between items-center bg-gray-50">
-                <h3 className="font-bold text-gray-900">Bukti Pembayaran</h3>
-                <button onClick={() => setShowProofModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
-              </div>
-              <div className="p-4 bg-gray-100">
-                <img src={payment.proof_url} alt="Bukti Transfer" className="w-full rounded-xl shadow-sm max-h-[60vh] object-contain bg-white" />
-              </div>
-            </motion.div>
-          </div>
-        )}
 
         {/* ORDER PROGRESS */}
         {/* ============================================ */}

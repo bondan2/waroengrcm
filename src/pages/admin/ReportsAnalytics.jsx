@@ -54,13 +54,14 @@ export default function ReportsAnalytics() {
         .gte('created_at', startIso).lte('created_at', endIso).eq('status', 'completed')
       
       const pData = payments || []
-      const totalRevenue = pData.reduce((s, p) => s + p.amount, 0)
+      const totalRevenue = pData.reduce((s, p) => s + (Number(p.amount) || 0), 0)
       
       // Calculate by method
       const byMethod = { cash: 0, qris: 0 }
       pData.forEach(p => {
-        if (p.method === 'cash') byMethod.cash += p.amount
-        if (p.method === 'qris') byMethod.qris += p.amount
+        const amt = Number(p.amount) || 0;
+        if (p.method === 'cash') byMethod.cash += amt
+        if (p.method === 'qris') byMethod.qris += amt
       })
 
       // Fetch all orders for counts, types, performance
@@ -107,7 +108,7 @@ export default function ReportsAnalytics() {
         pData.forEach(p => {
           const d = new Date(p.created_at)
           const hour = `${d.getHours().toString().padStart(2, '0')}:00`
-          trendMap[hour] += p.amount
+          trendMap[hour] += (Number(p.amount) || 0)
         })
       } else {
         const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
@@ -115,7 +116,7 @@ export default function ReportsAnalytics() {
           const d = new Date(p.created_at)
           const key = `${d.getDate()} ${dayNames[d.getDay()]}`
           if (!trendMap[key]) trendMap[key] = 0
-          trendMap[key] += p.amount
+          trendMap[key] += (Number(p.amount) || 0)
         })
       }
 
@@ -157,7 +158,8 @@ export default function ReportsAnalytics() {
   ]
 
   const maxTrendValue = useMemo(() => {
-    return Math.max(...analytics.trends.map(t => t.value), 1)
+    const vals = analytics.trends.map(t => Number(t.value) || 0)
+    return vals.length > 0 ? Math.max(...vals, 1) : 1
   }, [analytics.trends])
 
   return (
@@ -184,7 +186,7 @@ export default function ReportsAnalytics() {
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-2 overflow-x-auto mb-8 hide-scrollbar p-1">
+      <div className="sticky top-0 z-20 bg-[#f9fafb]/90 backdrop-blur-md pt-2 pb-2 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 flex space-x-2 overflow-x-auto mb-8 hide-scrollbar border-b border-gray-100">
         {reports.map(r => (
           <button key={r.id} onClick={() => setActiveReport(r.id)}
             className={`flex items-center px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all shadow-sm ${
@@ -215,7 +217,7 @@ export default function ReportsAnalytics() {
             {/* SALES REPORT */}
             {activeReport === 'sales' && (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Total Revenue */}
                   <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl p-6 shadow-xl shadow-orange-500/20 text-white relative overflow-hidden">
                     <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
@@ -280,15 +282,16 @@ export default function ReportsAnalytics() {
                   {analytics.trends.length === 0 || analytics.sales.totalRevenue === 0 ? (
                     <div className="h-48 flex items-center justify-center text-gray-400 font-medium bg-gray-50 rounded-2xl">Belum ada data pendapatan</div>
                   ) : (
-                    <div className="h-56 flex items-end justify-between gap-2 sm:gap-4 px-2">
+                    <div className="overflow-x-auto hide-scrollbar pb-2 w-full">
+                      <div className="h-56 flex items-end justify-between gap-3 sm:gap-4 min-w-[500px] w-full px-2 pt-8">
                       {analytics.trends.map((t, i) => {
                         const heightPct = t.value > 0 ? Math.max((t.value / maxTrendValue) * 100, 5) : 0;
                         return (
-                          <div key={i} className="flex flex-col items-center flex-1 group">
+                          <div key={i} className="flex flex-col items-center justify-end flex-1 group h-full">
                             <div className="opacity-0 group-hover:opacity-100 transition-opacity mb-2 bg-gray-900 text-white text-[10px] sm:text-xs font-bold py-1 px-2 rounded absolute -translate-y-8 z-10 whitespace-nowrap pointer-events-none">
                               {formatCurrency(t.value)}
                             </div>
-                            <div className="w-full max-w-[40px] bg-orange-50 rounded-t-xl relative overflow-hidden group-hover:bg-orange-100 transition-colors" style={{ height: '100%' }}>
+                            <div className="w-[30px] sm:w-[40px] bg-orange-50 rounded-t-xl relative overflow-hidden group-hover:bg-orange-100 transition-colors flex-1 w-full" style={{ minHeight: '10px' }}>
                               <motion.div 
                                 initial={{ height: 0 }}
                                 animate={{ height: `${heightPct}%` }}
@@ -300,6 +303,7 @@ export default function ReportsAnalytics() {
                           </div>
                         )
                       })}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -308,7 +312,7 @@ export default function ReportsAnalytics() {
 
             {/* PERFORMANCE REPORT */}
             {activeReport === 'performance' && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 relative overflow-hidden group">
                   <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Clock className="w-6 h-6 text-blue-600" />

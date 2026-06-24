@@ -110,12 +110,12 @@ function App() {
           <Route path="/menu" element={<Menu />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
-          <Route path="/order/:id" element={<OrderTracking />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/contact" element={<Contact />} />
         </Route>
 
-        {/* QR Table Order - Public */}
+        {/* Isolated Public Routes (No Global Navbar) */}
+        <Route path="/order/:id" element={<OrderTracking />} />
         <Route path="/order" element={<QRTableOrder />} />
 
         {/* ============================================ */}

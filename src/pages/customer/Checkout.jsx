@@ -24,7 +24,7 @@ export default function Checkout() {
   const [tableNumber, setTableNumber] = useState(tableId || '')
   const [orderTypeState, setOrderTypeState] = useState('dine_in')
   const [notes, setNotes] = useState(guestNotes || '')
-  const [paymentMethod, setPaymentMethod] = useState('cash')
+  const [paymentMethod, setPaymentMethod] = useState('qris')
   
   const [qrisImage, setQrisImage] = useState(null)
   const [qrisLoading, setQrisLoading] = useState(true)
@@ -224,7 +224,7 @@ export default function Checkout() {
       clearCart()
       playOrderNewSound()
       toast.success('Pesanan dibuat!')
-      navigate(`/order/${order.id}`)
+      navigate(`/order/${order.id}`, { replace: true })
 
     } catch (error) {
       console.error('Checkout error:', error)
@@ -439,12 +439,7 @@ export default function Checkout() {
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-3 mb-2">
-              <button type="button" onClick={() => setPaymentMethod('cash')}
-                className={`p-3.5 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all ${paymentMethod === 'cash' ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-gray-100 hover:border-gray-200 text-gray-600'}`}>
-                <Banknote className="w-6 h-6" />
-                <span className="font-bold text-sm">Tunai di Kasir</span>
-              </button>
+            <div className="grid grid-cols-1 gap-3 mb-2">
               <button type="button" onClick={() => setPaymentMethod('qris')}
                 className={`p-3.5 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all ${paymentMethod === 'qris' ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-gray-100 hover:border-gray-200 text-gray-600'}`}>
                 <QrCode className="w-6 h-6" />

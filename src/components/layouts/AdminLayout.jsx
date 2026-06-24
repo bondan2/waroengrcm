@@ -58,7 +58,7 @@ export default function AdminLayout() {
   }
 
   return (
-    <div className="h-screen flex overflow-hidden bg-gray-50">
+    <div className="fixed inset-0 flex overflow-hidden bg-gray-50">
       {/* Mobile menu overlay */}
       <AnimatePresence>
         {mobileMenuOpen && (
