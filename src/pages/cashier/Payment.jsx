@@ -315,6 +315,22 @@ export default function CashierPayment() {
     setShowProofModal(true)
   }
 
+  const handleEnlargeImage = (e) => {
+    e.stopPropagation();
+    if (proofImage && proofImage.startsWith('data:')) {
+      const w = window.open("");
+      if (w) {
+        w.document.write(`<html><head><title>Bukti Transfer</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;background:#0e1111;min-height:100vh;"><img src="${proofImage}" style="max-width:100%;max-height:100vh;object-fit:contain;"/></body></html>`);
+        w.document.close();
+      } else {
+        toast.error("Gagal membuka gambar. Pop-up diblokir oleh browser.");
+      }
+    } else {
+      window.open(proofImage, '_blank');
+    }
+  }
+
+
   // ============================================
   // VALIDASI PEMBAYARAN
   // ============================================
@@ -944,7 +960,7 @@ export default function CashierPayment() {
                         src={proofImage} 
                         alt="Bukti Pembayaran" 
                         className="w-full max-h-[60vh] object-contain transition-transform duration-500 group-hover:scale-[1.02] cursor-zoom-in" 
-                        onClick={() => window.open(proofImage, '_blank')}
+                        onClick={handleEnlargeImage}
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors pointer-events-none flex items-center justify-center">
                         <div className="opacity-0 group-hover:opacity-100 bg-white/90 text-gray-900 px-4 py-2 rounded-xl font-bold text-sm shadow-lg flex items-center backdrop-blur-sm transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">
